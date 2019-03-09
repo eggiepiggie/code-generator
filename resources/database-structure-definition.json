@@ -1,16 +1,18 @@
 {
-	"Fruits" : {
+	"fruits" : {
 		"fields" : [
 			{
-				"name" : "Colour",
+				"name" : "colour",
 				"type" : "str",
 				"is_unique" : false,
-				"is_null" : false
+				"is_null" : false,
+				"auto_inc" : false
 			},{
-				"name" : "Weight",
+				"name" : "weight",
 				"type" : "int",
 				"is_unique" : false,
-				"is_null" : false
+				"is_null" : false,
+				"auto_inc" : true
 			}
 		],
 		"constraints" : [
