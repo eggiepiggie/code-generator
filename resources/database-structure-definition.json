@@ -1,0 +1,25 @@
+{
+	"Fruits" : {
+		"fields" : [
+			{
+				"name" : "Colour",
+				"type" : "str",
+				"is_unique" : false,
+				"is_null" : false
+			},{
+				"name" : "Weight",
+				"type" : "int",
+				"is_unique" : false,
+				"is_null" : false
+			}
+		],
+		"constraints" : [
+			{
+				"fields" : [
+					"field1",
+					"field2"
+				]
+			}
+		]
+	}
+}
