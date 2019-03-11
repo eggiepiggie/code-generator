@@ -1,5 +1,5 @@
 {
-	"Fruits" : {
+	"Fruit" : {
 		"fields" : [
 			{
 				"name" : "Id",
@@ -27,11 +27,11 @@
 				},
 				"is_not_null" : true
 			},{
-				"name" : "Size",
+				"name" : "DepartmentId",
 				"type" : "int",
 				"is_not_null" : true,
 				"references" : {
-					"ref_table" : "Size",
+					"ref_table" : "Department",
 					"ref_column" : "Id"
 				}
 			}
@@ -44,5 +44,51 @@
 				]
 			}
 		]
+	},
+	"PriceHistory" : {
+		"fields" : [
+			{
+				"name" : "Id",
+				"type" : "int",
+				"auto_inc" : true,
+				"is_pk" : true
+			},{
+				"name" : "Date",
+				"type" : "date",
+				"is_not_null" : true
+			},{
+				"name" : "Price",
+				"type" : "double",
+				"is_not_null" : true
+			},{
+				"name" : "FruitId",
+				"type" : "int",
+				"is_not_null" : true,
+				"references" : {
+					"ref_table" : "Fruit",
+					"ref_column" : "Id"
+				}
+			}
+		],
+		"constraints" : []
+	},
+	"Department" : {
+		"fields" : [
+			{
+				"name" : "Id",
+				"type" : "int",
+				"auto_inc" : true,
+				"is_pk" : true
+			},{
+				"name" : "Name",
+				"type" : "date",
+				"is_unique" : true,
+				"is_not_null" : true
+			},{
+				"name" : "Description",
+				"type" : "text"
+			}
+		],
+		"constraints" : []
 	}
 }

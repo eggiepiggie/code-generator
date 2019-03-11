@@ -2,6 +2,7 @@ from utils.term_utils import *
 
 import resources.cli_styles as cs
 import utils.table_utils as tu
+import utils.do_utils as dou
 import sys
 
 def main(args):
@@ -23,7 +24,11 @@ def main(args):
 			printt_error("No object parameter is provided.")
 			prompt()
 			return
-		tu.create(obj_name)
+
+		if obj_name == "--all":
+			tu.create_all()
+		else:
+			tu.create(obj_name)
 	
 	elif action == "--drop-table":
 		if not obj_name:
@@ -32,6 +37,13 @@ def main(args):
 			return
 		tu.drop(obj_name)
 	
+	elif action == "--create-obj":
+		if not obj_name:
+			printt_error("No object parameter is provided.")
+			prompt()
+			return
+		dou.initialize(obj_name)
+
 	elif action == "--help":
 		prompt()
 	
@@ -51,8 +63,14 @@ def prompt():
 	printt("- Generate create table SQL statement for object.", cs.PASTEL_GREEN)
 	printt("\tgenerator.py --create-table {}<table-name>".format(cs.PASTEL_PINK), cs.PASTEL_BLUE)
 	printt()
+	printt("- Generate create table SQL statement for all objects.", cs.PASTEL_GREEN)
+	printt("\tgenerator.py --create-table {}--all".format(cs.PASTEL_PINK), cs.PASTEL_BLUE)
+	printt()
 	printt("- Generate drop table SQL statement for object.", cs.PASTEL_GREEN)
 	printt("\tgenerator.py --drop-table {}<table-name>".format(cs.PASTEL_PINK), cs.PASTEL_BLUE)
+	printt()
+	printt("- Generate DO class for object.", cs.PASTEL_GREEN)
+	printt("\tgenerator.py --create-obj {}<obj-name>".format(cs.PASTEL_PINK), cs.PASTEL_BLUE)
 	printt()
 
 if __name__ == "__main__":
