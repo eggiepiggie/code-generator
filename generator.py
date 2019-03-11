@@ -10,6 +10,7 @@ def main(args):
 
 	if args_count == 1:
 		prompt()
+		return
 	else:
 		action = args[1] if args_count > 1 else None
 		obj_name = args[2] if args_count > 2 else None

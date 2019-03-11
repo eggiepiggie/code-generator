@@ -1,18 +1,39 @@
 {
-	"fruits" : {
+	"Fruits" : {
 		"fields" : [
 			{
-				"name" : "colour",
-				"type" : "str",
-				"is_unique" : false,
-				"is_null" : false,
-				"auto_inc" : false
-			},{
-				"name" : "weight",
+				"name" : "Id",
 				"type" : "int",
-				"is_unique" : false,
-				"is_null" : false,
-				"auto_inc" : true
+				"auto_inc" : true,
+				"is_pk" : true
+			},{
+				"name" : "Name",
+				"type" : "str",
+				"is_unique" : true,
+				"is_not_null" : true
+			},{
+				"name" : "Colour",
+				"type" : "str",
+				"is_not_null" : true
+			},{
+				"name" : "Weight",
+				"type" : "double",
+				"is_not_null" : true
+			},{
+				"name" : "IsStocked",
+				"type" : "bool",
+				"default" : {
+					"value" : true
+				},
+				"is_not_null" : true
+			},{
+				"name" : "Size",
+				"type" : "int",
+				"is_not_null" : true,
+				"references" : {
+					"ref_table" : "Size",
+					"ref_column" : "Id"
+				}
 			}
 		],
 		"constraints" : [

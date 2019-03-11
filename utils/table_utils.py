@@ -3,15 +3,21 @@ from datetime import datetime
 
 import json
 
-# TODO #1: We could have each of these functions to take in a parameter. CMD or FILE
-# TODO #2: Auto-generate Id column
 # TODO #3: Auto-generate insert timestamp
-# TODO #4: Auto-generate NOT NULL
-# TODO #5: Auto-generate UNIQUE
+
+# Defaults for column definitions:
+#		- NULL
+#		- NO DEFAULT
+#		- NO UNIQUE
+#		- NO AUTO INCREMENT
+
 SQL_DATA_TYPES = {
-	"str" :			"VARCHAR(255)",
-	"int" : 		"INT",
+	"bool" : 		"BOOLEAN",
 	"date" : 		"DATE",
+	"double" :		"DOUBLE",
+	"int" : 		"INT",
+	"str" :			"VARCHAR(255)",
+	"text" :		"TEXT",
 	"timestamp" :	"TIMESTAMP"
 }
 
@@ -19,30 +25,23 @@ def create_all():
 	"""Generates CREATE TABLE statements for all tables."""
 	return True
 
-def create(table_name, column_json = None, action = "CMD"):
+def create(tbl_name, column_json = None):
 	"""Generates CREATE TABLE statement for specified table."""
-	# Load database definition.
 	db_schema = load_database_definition()
 
-	if table_name not in db_schema:
+	if tbl_name not in db_schema:
 		printt_error("Object could not be found in table definition json.")
 		return
 
-	tbl_json = db_schema[table_name]
+	tbl_json = db_schema[tbl_name]
 
-	generate_comment(table_name, tbl_json)	
-	print("CREATE TABLE {table_name} (".format(table_name = table_name))
+	create_table_desciption_block(tbl_name, tbl_json)	
 
-	for field in tbl_json["fields"]:
-
-		col_name = field["name"]
-		col_type = SQL_DATA_TYPES[field["type"]]
-		col_is_null = "NULL" if field["is_null"] else "NOT NULL"
-		col_auto_inc = "AUTO_INCREMENT"if field["auto_inc"] else ""
-
-		print("\t{field} {data_type} {is_null} {auto_inc},"
-			.format(field = col_name, data_type = col_type, is_null = col_is_null, auto_inc = col_auto_inc))
-
+	print("CREATE TABLE {table_name} (".format(table_name = tbl_name))
+	create_columns(tbl_name, tbl_json)
+	#create_unique_constraints(tbl_json)
+	#create_pk_constraints(tbl_json)
+	create_fk_constraints(tbl_json)
 	print(");")
 
 def drop(table_name, action="CMD"):
@@ -51,7 +50,7 @@ def drop(table_name, action="CMD"):
 def update():
 	return True
 
-def generate_comment(table_name, table_json = None):
+def create_table_desciption_block(table_name, table_json = None):
 	"""Takes table definition JSON and generate documentation about table."""
 	print("# ===================================================================")
 	print("#  WARNING: This is an auto-generated file. Do not modify this file.")
@@ -61,16 +60,12 @@ def generate_comment(table_name, table_json = None):
 	print("#   -> Columns:")
 
 	for field in table_json["fields"]:
-		field_name = field["name"]
-		field_type = field["type"]
-		print("#     -> '{name}' : {type} ".format(name = field_name, type = field_type))
-	
+		print("#     -> '{name}' : {type} ".format(name = field["name"], type = field["type"]))
+
 	print("#")
 	print("# ===================================================================")
 	print("#  Generated on: {ts}".format(ts = str(datetime.now())))
 	print("# ===================================================================")
-
-	return True
 
 def load_database_definition():
 	"""Loads the database definition and return definition as JSON dictionary."""
@@ -81,3 +76,81 @@ def load_database_definition():
 		print("Error: Could not load JSON database definition.", fnf_error)
 
 	return db_json
+
+def create_columns(tbl_name, tbl_json):
+	"""Creates column for the given table."""
+	for idx, col in enumerate(tbl_json["fields"]):
+
+		comma = "," if idx != 0 else ""
+		c_name = ""
+		c_type = ""
+		c_is_not_null = ""
+		c_auto_inc = ""
+		c_default = ""
+		c_is_unique = ""
+		c_is_pk = ""
+
+		if "name" in col:
+			c_name = col["name"]
+
+		if "type" in col:
+			c_type = SQL_DATA_TYPES[col["type"]]
+
+		if "is_not_null" in col:
+			c_is_not_null = col["is_not_null"]
+			c_is_not_null = " NOT NULL" if c_is_not_null else ""
+
+		if "auto_inc" in col:
+			c_auto_inc = col["auto_inc"]
+			c_auto_inc = " AUTO_INCREMENT" if c_auto_inc else ""
+
+		if "default" in col:
+			default_value = ""
+			if c_type == "INT" or c_type == "BOOLEAN" or c_type == "DOUBLE":
+				default_value = str(col["default"]["value"])
+			else:
+				default_value = "'" + col["default"]["value"] + "'"
+			c_default = " DEFAULT " + default_value
+
+		if "is_unique" in col:
+			c_is_unique = " UNIQUE"
+
+		if "is_pk" in col:
+			c_is_pk = " PRIMARY KEY"
+
+		if not c_name or not c_type:
+			printt_error("Name or Type must be provided in column definition for table {}.".format(tbl_name))
+			return
+
+		print("\t{comma}{field} {data_type}{is_not_null}{is_unique}{is_pk}{default}{auto_inc}"
+			.format(
+				comma = comma,
+				field = c_name,
+				data_type = c_type,
+				is_not_null = c_is_not_null,
+				is_unique = c_is_unique,
+				is_pk = c_is_pk,
+				default = c_default,
+				auto_inc = c_auto_inc))
+
+def create_unique_constraints(tbl_json):
+	"""Generates unique constraints based off database definition for given table."""
+	for col in tbl_json["fields"]:
+		if "is_unique" in col and col["is_unique"]:
+			print("\t,UNIQUE ({})".format(col["name"]))
+
+def create_pk_constraints(tbl_json):
+	"""Generates PK constraints based off database definition for given table."""
+	for col in tbl_json["fields"]:
+		if "is_pk" in col and col["is_pk"]:
+			print("\t,PRIMARY KEY ({})".format(col["name"]))
+
+def create_fk_constraints(tbl_json):
+	"""Generates FK constraints based off database definition for given table."""
+	for col in tbl_json["fields"]:
+		if "references" in col:
+			column_name = col["name"]
+			ref_table = col["references"]["ref_table"]
+			ref_column = col["references"]["ref_column"]
+			print("\t,FOREIGN KEY ({column_name}) REFERENCES {ref_table}({ref_column})"
+				.format(column_name = column_name, ref_table = ref_table, ref_column = ref_column))
