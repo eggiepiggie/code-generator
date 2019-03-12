@@ -1,6 +1,7 @@
 from utils.term_utils import printt, printt_critical, printt_error, printt_warning
 from utils.io_utils import load_json
 from utils.table_utils import validate_schema
+from utils import dao_utils
 from datetime import datetime
 
 import resources.cli_styles as cs
@@ -12,14 +13,28 @@ def initialize(obj_name):
 	if not validate_schema(db_schema, obj_name):
 		return 
 
+	create_object_comment_block(obj_name)
 	create_class(obj_name)
 	create_init_method(obj_name, db_schema[obj_name])
 	create_reference_method(obj_name, db_schema[obj_name])
-	create_list_objects_of_type(obj_name)
 	create_list_referenced_methods(db_schema, obj_name)
+	dao_utils.create_list_objects_of_type(obj_name)
+	dao_utils.create_methods_by_unique_key(obj_name, db_schema[obj_name])
+
+def create_object_comment_block(obj_name):
+	"""Creates a comment block about the class."""
+	printt("# ===================================================================", cs.PASTEL_YELLOW)
+	printt("#  WARNING: This is an auto-generated file. Do not modify this file.", cs.PASTEL_YELLOW)
+	printt("# ===================================================================", cs.PASTEL_YELLOW)
+	printt("#", cs.PASTEL_YELLOW)
+	printt("#   {} Object Class".format(obj_name), cs.PASTEL_YELLOW)
+	printt("#", cs.PASTEL_YELLOW)
+	printt("# ===================================================================", cs.PASTEL_YELLOW)
+	printt("#  Generated on: {ts}".format(ts = str(datetime.now())), cs.PASTEL_YELLOW)
+	printt("# ===================================================================", cs.PASTEL_YELLOW)
 
 def create_class(obj_name):
-	print("class {}:".format(obj_name))
+	printt("class {}:".format(obj_name), cs.DEFAULT)
 
 def create_init_method(obj_name, tbl_schema):
 	"""Creates constructor method for given object."""
@@ -54,15 +69,10 @@ def create_list_referenced_methods(db_schema, obj_name):
 		for field in db_schema[obj]["fields"]:
 			if "references" in field and field["references"]["ref_table"] == obj_name:
 				u_obj_name = uncapitalize(obj)
-				print("\tdef list{}s(self):".format(obj))
-				print("\t\t#TODO: Returns {}s belonging to this {}.".format(u_obj_name, u_obj_name))
+				print("\tdef get{}s(self):".format(obj))
+				print("\t\t#TODO: Returns {}s belonging to this {}.".format(u_obj_name, uncapitalize(obj_name)))
 				print("\t\treturn True")
-
-def create_list_objects_of_type(obj_name):	
-	print("\tdef list{}s(self):")	
-	print("\t\t#TODO: Returns all {}s.".format(uncapitalize(obj_name)))
-	print("\t\treturn True")
-	print("")
+				print("")
 
 def uncapitalize(name):
 	"""Lowercases the first letter of the name."""

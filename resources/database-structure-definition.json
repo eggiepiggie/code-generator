@@ -1,5 +1,5 @@
 {
-	"Fruit" : {
+	"Item" : {
 		"fields" : [
 			{
 				"name" : "Id",
@@ -11,6 +11,9 @@
 				"type" : "str",
 				"is_unique" : true,
 				"is_not_null" : true
+			},{
+				"name" : "Description",
+				"type" : "text"
 			},{
 				"name" : "Colour",
 				"type" : "str",
@@ -45,6 +48,35 @@
 			}
 		]
 	},
+	"StockLevel" : {
+		"fields" : [
+			{
+				"name" : "Id",
+				"type" : "int",
+				"auto_inc" : true,
+				"is_pk" : true
+			},{
+				"name" : "ItemId",
+				"type" : "int",
+				"is_not_null" : true,
+				"references" : {
+					"ref_table" : "Item",
+					"ref_column" : "Id"
+				}
+			},{
+				"name" : "Count",
+				"type" : "int",
+				"default" : {
+					"value" : 0
+				},
+				"is_not_null" : true
+			},{
+				"name" : "NextShipment",
+				"type" : "date",
+				"is_not_null" : true
+			}	
+		]
+	},
 	"PriceHistory" : {
 		"fields" : [
 			{
@@ -61,11 +93,11 @@
 				"type" : "double",
 				"is_not_null" : true
 			},{
-				"name" : "FruitId",
+				"name" : "ItemId",
 				"type" : "int",
 				"is_not_null" : true,
 				"references" : {
-					"ref_table" : "Fruit",
+					"ref_table" : "Item",
 					"ref_column" : "Id"
 				}
 			}
@@ -90,5 +122,49 @@
 			}
 		],
 		"constraints" : []
+	},
+	"Order" : {
+		"fields" : [
+			{
+				"name" : "Id",
+				"type" : "int",
+				"auto_inc" : true,
+				"is_pk" : true
+			},{
+				"name" : "PurchaseDate",
+				"type" : "date",
+				"is_not_null" : true
+			}
+		]
+	},
+	"OrderList" : {
+		"fields" : [
+			{
+				"name" : "Id",
+				"type" : "int",
+				"auto_inc" : true,
+				"is_pk" : true
+			},{
+				"name" : "OrderId",
+				"type" : "date",
+				"is_not_null" : true,
+				"references" : {
+					"ref_table" : "Order",
+					"ref_column" : "Id"
+				}
+			},{
+				"name" : "ItemId",
+				"type" : "int",
+				"is_not_null" : true,
+				"references" : {
+					"ref_table" : "Item",
+					"ref_column" : "Id"
+				}
+			},{
+				"name" : "Count",
+				"type" : "int",
+				"is_not_null" : true
+			}
+		]
 	}
 }

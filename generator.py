@@ -55,7 +55,7 @@ def prompt():
 	printt()
 	printt("Eggie's SQL Code Generator", cs.PASTEL_PURPLE)
 	printt()
-	printt("A simple SQL code generator.")
+	printt("A simple SQL code generator.", cs.LIGHT_GRAY)
 	printt()
 	printt("- Print out the help prompt.", cs.PASTEL_GREEN)
 	printt("\tgenerator.py --help", cs.PASTEL_BLUE)
