@@ -1,3 +1,7 @@
 {
+	"databaseUsername" : "root",
+	"databasePassword" : "1qazXSW@",
+	"databaseHost" : "127.0.0.1",
+	"databaseName" : "Market",
 	"databaseDefinition" : "database-structure-definition.json"
 }

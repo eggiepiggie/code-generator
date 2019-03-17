@@ -3,6 +3,7 @@ from utils.term_utils import *
 import resources.cli_styles as cs
 import utils.table_utils as tu
 import utils.do_utils as dou
+import utils.dao_utils as daou
 import sys
 
 def main(args):
@@ -37,12 +38,19 @@ def main(args):
 			return
 		tu.drop(obj_name)
 	
-	elif action == "--create-obj":
+	elif action == "--create-do-obj":
 		if not obj_name:
 			printt_error("No object parameter is provided.")
 			prompt()
 			return
 		dou.initialize(obj_name)
+
+	elif action == "--create-dao-obj":
+		if not obj_name:
+			printt_error("No object parameter is provided.")
+			prompt()
+			return
+		daou.initialize(obj_name)
 
 	elif action == "--help":
 		prompt()

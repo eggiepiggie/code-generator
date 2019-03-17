@@ -131,13 +131,16 @@
 				"auto_inc" : true,
 				"is_pk" : true
 			},{
+				"name" : "Customer",
+				"type" : "str"
+			},{
 				"name" : "PurchaseDate",
 				"type" : "date",
 				"is_not_null" : true
 			}
 		]
 	},
-	"OrderList" : {
+	"OrderItemList" : {
 		"fields" : [
 			{
 				"name" : "Id",
