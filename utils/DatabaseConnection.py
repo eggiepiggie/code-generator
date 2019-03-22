@@ -4,22 +4,22 @@ from utils.properties_utils import get_db_properties
 import mysql.connector
 from mysql.connector import errorcode, connection
 
-class DatabaseConnection:
+class DatabaseConnection(object):
 	'''Singleton class for a MySQL connection'''
-	__instance = None
-	__connection = None # Stores a single db connection that would be used through the app.
+	instance = None
+	connection = None # Stores a single db connection that would be used through the app.
 
 	def __new__(cls):
-		if DatabaseConnection.__instance is None:
-			DatabaseConnection.__instance = object.__new__(cls)
-		return DatabaseConnection.__instance
+		if DatabaseConnection.instance is None:
+			DatabaseConnection.instance = object.__new__(cls)
+		return DatabaseConnection.instance
 
 	def __init__(self):
 		'''Creates and opens a single db connection.'''
-		if DatabaseConnection.__connection is None:
+		if DatabaseConnection.connection is None:
 			db_config = get_db_properties()
 			try:
-				DatabaseConnection.__connection = connection.MySQLConnection(
+				DatabaseConnection.connection = connection.MySQLConnection(
 					user = db_config["dbUsername"],
 					password = db_config["dbPassword"],
 					host = db_config["dbHost"],
@@ -33,27 +33,26 @@ class DatabaseConnection:
 				else:
 					printt_error(err)
 				return
-		return DatabaseConnection.__connection
 
 	def __del__(self):
 		'''Closes the database connection.'''
-		if DatabaseConnection.__connection:
-			DatabaseConnection.__connection.close()
+		if DatabaseConnection.connection:
+			DatabaseConnection.connection.close()
 
 	def execute_query(self, query = None, data = None):
 		'''Executes the insert/update sql query.'''
-		if DatabaseConnection.__connection is None:
+		if DatabaseConnection.connection is None:
 			printt_error("Database connection is null.")
-		cursor = DatabaseConnection.__connection.cursor()
+		cursor = DatabaseConnection.connection.cursor()
 		cursor.execute(query, data)
-		DatabaseConnection.__connection.commit()
+		DatabaseConnection.connection.commit()
 		cursor.close()
 
 	def query_single_result(self, query = None, data = None):
 		'''Executes the sql query and returns a single row of data.'''
-		if DatabaseConnection.__connection is None:
+		if DatabaseConnection.connection is None:
 			printt_error("Database connection is null.")
-		cursor = DatabaseConnection.__connection.cursor()
+		cursor = DatabaseConnection.connection.cursor()
 		cursor.execute(query, data)
 		row = cursor.fetchone()
 		cursor.close()
@@ -61,9 +60,9 @@ class DatabaseConnection:
 
 	def query_many_result(self, query = None, count = 1, data = None):
 		'''Executes the sql query and returns a max number of result (for pagination).'''
-		if DatabaseConnection.__connection is None:
+		if DatabaseConnection.connection is None:
 			printt_error("Database connection is null.")
-		cursor = DatabaseConnection.__connection.cursor()
+		cursor = DatabaseConnection.connection.cursor()
 		cursor.execute(query, data)
 		resultSet = cursor.fetchmany(count)
 		cursor.close()
@@ -71,11 +70,35 @@ class DatabaseConnection:
 
 	def query_all_result(self, query = None, data = None):
 		'''Executes the sql query and returns all the results of the table.'''
-		if DatabaseConnection.__connection is None:
+		if DatabaseConnection.connection is None:
 			printt_error("Database connection is null.")
-		cursor = DatabaseConnection.__connection.cursor()
+		cursor = DatabaseConnection.connection.cursor()
 		cursor.execute(query, data)
 		resultSet = cursor.fetchall()
 		cursor.close()
 		return resultSet
 
+	def count_entries(self, table_name):
+		query = "SELECT COUNT(*) FROM {}".format(table_name)
+		if DatabaseConnection.connection is None:
+			printt_error("Database connection is null.")
+		cursor = DatabaseConnection.connection.cursor()
+		cursor.execute(query)
+		resultSet = cursor.fetchall()
+		rowCount = cursor.rowcount
+		cursor.close()
+		return rowCount
+
+	def query_table_exists(self, table_name):
+		'''Determines if table exists.'''
+		if not table_name:
+			return False
+		query = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{}'".format(table_name)
+		cursor = DatabaseConnection.connection.cursor()
+		cursor.execute(query)
+		result = cursor.fetchone()
+		if result[0] == 1:
+			cursor.close()
+			return True
+		cursor.close()
+		return False
