@@ -24,6 +24,7 @@ class DatabaseConnection(object):
 					password = db_config["dbPassword"],
 					host = db_config["dbHost"],
 					database = db_config["dbName"])
+				DatabaseConnection.connection.autocommit = True
 			except mysql.connector.Error as err:
 
 				if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -45,14 +46,38 @@ class DatabaseConnection(object):
 			printt_error("Database connection is null.")
 		cursor = DatabaseConnection.connection.cursor()
 		cursor.execute(query, data)
+		rowsAffected = cursor.rowcount
 		DatabaseConnection.connection.commit()
 		cursor.close()
+		return rowsAffected
+
+	def insert_one(self, query = None, data = None):
+		'''Executes the insert/update sql query.'''
+		if DatabaseConnection.connection is None:
+			printt_error("Database connection is null.")
+		cursor = DatabaseConnection.connection.cursor()
+		cursor.execute(query, data)
+		row_id = cursor.lastrowid
+		DatabaseConnection.connection.commit()
+		cursor.close()
+		return row_id
+
+	def update_one(self, query = None, data = None):
+		'''Executes the insert/update sql query.'''
+		if DatabaseConnection.connection is None:
+			printt_error("Database connection is null.")
+		cursor = DatabaseConnection.connection.cursor()
+		cursor.execute(query, data)
+		row_id = cursor.lastrowid
+		DatabaseConnection.connection.commit()
+		cursor.close()
+		return row_id
 
 	def query_single_result(self, query = None, data = None):
 		'''Executes the sql query and returns a single row of data.'''
 		if DatabaseConnection.connection is None:
 			printt_error("Database connection is null.")
-		cursor = DatabaseConnection.connection.cursor()
+		cursor = DatabaseConnection.connection.cursor(dictionary = True)
 		cursor.execute(query, data)
 		row = cursor.fetchone()
 		cursor.close()
@@ -62,7 +87,7 @@ class DatabaseConnection(object):
 		'''Executes the sql query and returns a max number of result (for pagination).'''
 		if DatabaseConnection.connection is None:
 			printt_error("Database connection is null.")
-		cursor = DatabaseConnection.connection.cursor()
+		cursor = DatabaseConnection.connection.cursor(dictionary = True)
 		cursor.execute(query, data)
 		resultSet = cursor.fetchmany(count)
 		cursor.close()
@@ -72,7 +97,7 @@ class DatabaseConnection(object):
 		'''Executes the sql query and returns all the results of the table.'''
 		if DatabaseConnection.connection is None:
 			printt_error("Database connection is null.")
-		cursor = DatabaseConnection.connection.cursor()
+		cursor = DatabaseConnection.connection.cursor(dictionary = True)
 		cursor.execute(query, data)
 		resultSet = cursor.fetchall()
 		cursor.close()

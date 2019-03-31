@@ -1,8 +1,13 @@
+from __future__ import print_function
 from utils.io_utils import load_json
 import resources.cli_styles as cs
 
 
-def printt(text = "", colour = cs.DEFAULT):
+def printt(text = "", colour = cs.DEFAULT, file = None):
+
+	if file:
+		print("{}".format(convert_tabs_to_spaces(text)), file = file)
+	# Logging this spoop.
 	print("{}{}".format(colour, convert_tabs_to_spaces(text)))
 
 def printt_red(text):

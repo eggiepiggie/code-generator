@@ -2,19 +2,19 @@
 #  WARNING: This is an auto-generated file. Do not modify this file.
 # ===================================================================
 #
-#   DepartmentDO Class
+#   PurchaseDO Class
 #
 # ===================================================================
-#  Generated on: 2019-03-29 23:14:57.109141
+#  Generated on: 2019-03-29 23:14:57.135422
 # ===================================================================
 from app.do.Base import BaseDO
 
 
-class DepartmentDO( BaseDO ):
-    def __init__(self, id = None, name = None, description = None):
+class PurchaseDO( BaseDO ):
+    def __init__(self, id = None, customer = None, purchaseDate = None):
         self.Id = id
-        self.Name = name
-        self.Description = description
+        self.Customer = customer
+        self.PurchaseDate = purchaseDate
 
     def toJson(self, simple = False):
         '''Converts this object into a json.'''
@@ -23,28 +23,28 @@ class DepartmentDO( BaseDO ):
             objJson['Id'] = self.Id
         else:
             objJson['Id'] = self.Id
-            objJson['Name'] = self.Name
-            objJson['Description'] = self.Description
+            objJson['Customer'] = self.Customer
+            objJson['PurchaseDate'] = str(self.PurchaseDate)
         return objJson
 
     def toString(self):
         '''Generates a string representation of this object.'''
-        return "DepartmentDO[id={}, name={}, description={}]".format(self.Id, self.Name, self.Description)
+        return "PurchaseDO[id={}, customer={}, purchaseDate={}]".format(self.Id, self.Customer, self.PurchaseDate)
 
-    def equalsTo(self, department):
+    def equalsTo(self, purchase):
         '''Compares this object with another object to see if they are equal.'''
-        if self.Name != department.Name:
+        if self.Customer != purchase.Customer:
             return False
-        if self.Description != department.Description:
+        if self.PurchaseDate != purchase.PurchaseDate:
             return False
         return True
 
     @classmethod
     def toObj(self, objJson = {}):
         '''Converts json into a object.'''
-        department = DepartmentDO()
-        department.Id = objJson['Id'] if 'Id' in objJson else None
-        department.Name = objJson['Name'] if 'Name' in objJson else None
-        department.Description = objJson['Description'] if 'Description' in objJson else None
-        return department
+        purchase = PurchaseDO()
+        purchase.Id = objJson['Id'] if 'Id' in objJson else None
+        purchase.Customer = objJson['Customer'] if 'Customer' in objJson else None
+        purchase.PurchaseDate = objJson['PurchaseDate'] if 'PurchaseDate' in objJson else None
+        return purchase
 
