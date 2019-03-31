@@ -1,0 +1,8 @@
+/app/bo/
+!/app/bo/Base.py
+/app/do/
+!/app/do/Base.py
+/app/dao/
+!/app/dao/Base.py
+/app/rest_api/
+!/app/rest_api/Base.py

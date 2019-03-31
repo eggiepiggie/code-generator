@@ -10,7 +10,7 @@ class RestApiUtils( BaseClassUtils ):
 
 	def __init__(self, objName, toFile = False):
 		'''We need to validate that this is a legit object in the json schema.'''
-		super(RestApiEggieUtils, self).__init__('RestApiEggieUtils')
+		super(RestApiUtils, self).__init__('RestApiUtils')
 		self.objName = objName
 		self.v_objName = self.uncapitalize(objName)
 		self.dbSchema = self.getSchema(objName)
@@ -84,7 +84,6 @@ class RestApiUtils( BaseClassUtils ):
 		self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.v_objName, self.v_objName, self.objName, self.v_objName))
 		self.printt_cls("\t\t{} = {}BO({}DO)".format(self.v_objName, self.objName, self.v_objName))
 		for col in self.objSchema["fields"]:
-			#if "references" not in col and col["name"] != "Id":
 			if col["name"] != "Id":
 				col_name = col["name"]
 				self.printt_cls("\t\t{}.set{}(args['{}'])".format(self.v_objName, col_name, col_name))
@@ -116,17 +115,14 @@ class RestApiUtils( BaseClassUtils ):
 					self.printt_cls("")
 					self.printt_cls("")
 
-
 	def generateRequestParameterParser(self):
 		"""Creates the init function."""
 		self.printt_cls("def getParameters(parser):")
 		self.printt_cls("\t'''Takes the requests body and returns it as json.'''")
 		self.printt_cls("\tparser = reqparse.RequestParser()")
 		for col in self.objSchema["fields"]:
-			#if "references" not in col and col["name"] != "Id":
 			if col["name"] != "Id":
 				self.printt_cls("\tparser.add_argument('{}')".format(col["name"]))
 		self.printt_cls("\treturn parser.parse_args()")
-
-
+		self.printt_cls("")
 

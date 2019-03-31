@@ -6,6 +6,7 @@ from utils.BoUtils import BoUtils
 from utils.DoUtils import DoUtils
 from utils.DaoUtils import DaoUtils
 from utils.RestApiUtils import RestApiUtils
+from utils.FlaskServerUtils import FlaskServerUtils
 import sys
 
 def main(args):
@@ -98,6 +99,8 @@ def main(args):
 			bou.generateClass()
 			apiu = RestApiUtils(obj_name, True)
 			apiu.generateClass()
+		fsu = FlaskServerUtils('Department', 'Market', True)
+		fsu.generateClass()
 
 	elif action == "--help":
 		prompt()
