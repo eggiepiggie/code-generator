@@ -1,7 +1,6 @@
 from utils.term_utils import printt, printt_critical, printt_error, printt_warning
 from utils.properties_utils import get_db_properties
 
-import mysql.connector
 from mysql.connector import errorcode, connection
 
 class DatabaseConnection(object):
@@ -32,7 +31,7 @@ class DatabaseConnection(object):
 				elif err.errno == errorcode.ER_BAD_DB_ERROR:
 					printt_error("Database does not exist.")
 				else:
-					printt_error(err)
+					printt_error(str(err))
 				return
 
 	def __del__(self):
