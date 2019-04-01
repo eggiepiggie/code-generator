@@ -6,7 +6,7 @@ import resources.cli_styles as cs
 def printt(text = "", colour = cs.DEFAULT, file = None):
 
 	if file:
-		print("{}".format(convert_tabs_to_spaces(text)), file = file)
+		print("{}".format(convert_tabs_to_spaces(text, 2)), file = file)
 	# Logging this spoop.
 	print("{}{}".format(colour, convert_tabs_to_spaces(text)))
 
@@ -28,8 +28,8 @@ def printt_error(text):
 def printt_warning(text):
 	printt("WARNING: " + text, cs.ORANGE)
 
-def convert_tabs_to_spaces(text):
-	text = text.replace("\t", "    ")
+def convert_tabs_to_spaces(text, length = 4):
+	text = text.replace("\t", " " * length)
 	return text
 
 def apply_syntax_colorization(text, language = None):

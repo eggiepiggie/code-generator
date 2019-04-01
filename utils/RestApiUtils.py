@@ -76,8 +76,9 @@ class RestApiUtils( BaseClassUtils ):
 		self.printt_cls("class {}ById(Resource):".format(self.objName))
 		self.printt_cls("")
 		self.printt_cls("\tdef get(self, {}Id):".format(self.v_objName))
-		self.printt_cls("\t\t{} = {}DAO.get{}ById({}Id)".format(self.v_objName, self.v_objName, self.objName, self.v_objName))
-		self.printt_cls("\t\treturn {}.toJson()".format(self.v_objName))
+		self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.v_objName, self.v_objName, self.objName, self.v_objName))
+		self.printt_cls("\t\t{}BO = {}BO({}DO)".format(self.v_objName, self.objName, self.v_objName))
+		self.printt_cls("\t\treturn {}BO.toJson()".format(self.v_objName))
 		self.printt_cls("")
 		self.printt_cls("\tdef put(self, {}Id):".format(self.v_objName))
 		self.printt_cls("\t\targs = getParameters(reqparse.RequestParser())")
@@ -102,7 +103,6 @@ class RestApiUtils( BaseClassUtils ):
 			for field in self.dbSchema[obj]["fields"]:
 				if "references" in field and field["references"]["ref_table"] == self.objName:
 					u_obj = self.uncapitalize(obj)
-					u_col_name = field["name"]
 					self.printt_cls("class {}{}s(Resource):".format(self.objName, obj))
 					self.printt_cls("\tdef get(self, {}Id):".format(self.v_objName))
 					self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.v_objName, self.v_objName, self.objName, self.v_objName))

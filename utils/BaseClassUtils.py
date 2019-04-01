@@ -8,6 +8,10 @@ import resources.cli_styles as cs
 
 class BaseClassUtils(object):
 
+	toFile = None
+	type = None
+	objName = None
+
 	def __init__(self, class_name = "BaseDAO"):
 		self.class_name = class_name
 

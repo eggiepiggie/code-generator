@@ -108,7 +108,7 @@ class DatabaseConnection(object):
 			printt_error("Database connection is null.")
 		cursor = DatabaseConnection.connection.cursor()
 		cursor.execute(query)
-		resultSet = cursor.fetchall()
+		cursor.fetchall()
 		rowCount = cursor.rowcount
 		cursor.close()
 		return rowCount
