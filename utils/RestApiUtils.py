@@ -6,6 +6,17 @@ from datetime import datetime
 
 import resources.cli_styles as cs
 
+'''
+	> I think I want this to use flask.request.  It seems a lot neater.
+	> We can use toObj() method from the DOs. Translate JSON to DOs.
+
+	@marketApp.route('/foo', methods=['POST']) 
+	def foo():
+		if not request.json:
+			abort(400)
+		print request.json
+		return json.dumps(request.json)
+'''
 class RestApiUtils( BaseClassUtils ):
 
 	def __init__(self, objName, toFile = False):

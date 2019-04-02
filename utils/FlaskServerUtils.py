@@ -12,7 +12,7 @@ class FlaskServerUtils( BaseClassUtils ):
 		'''We need to validate that this is a legit object in the json schema.'''
 		super(FlaskServerUtils, self).__init__('FlaskServerUtils')
 		self.appName = appName
-		self.v_appName = self.uncapitalize(appName)
+		self.uAppName = self.uncapitalize(appName)
 		self.objName = objName
 		self.uObjName = self.uncapitalize(objName)
 		self.dbSchema = self.getSchema(objName)
@@ -55,8 +55,8 @@ class FlaskServerUtils( BaseClassUtils ):
 
 	def generateServer(self):
 		'''Creates code for generating Flask server API.'''
-		self.printt_cls("{}App = Flask(__name__)".format(self.v_appName))
-		self.printt_cls("{}Api = Api({}App)".format(self.v_appName, self.v_appName))
+		self.printt_cls("{}App = Flask(__name__)".format(self.uAppName))
+		self.printt_cls("{}Api = Api({}App)".format(self.uAppName, self.uAppName))
 		self.printt_cls("")
 
 	def generateApiResources(self):
@@ -66,15 +66,15 @@ class FlaskServerUtils( BaseClassUtils ):
 			self.printt_cls("# ---------------------------------------------------------")
 			self.printt_cls("#   {} REST API".format(obj))
 			self.printt_cls("# ---------------------------------------------------------")
-			self.printt_cls("{}Api.add_resource( {}GetAll, '/{}' )".format(self.v_appName, obj, u_obj))
-			self.printt_cls("{}Api.add_resource( {}ById, '/{}/<int:{}Id>' )".format(self.v_appName, obj, u_obj, u_obj))
+			self.printt_cls("{}Api.add_resource( {}GetAll, '/{}' )".format(self.uAppName, obj, u_obj))
+			self.printt_cls("{}Api.add_resource( {}ById, '/{}/<int:{}Id>' )".format(self.uAppName, obj, u_obj, u_obj))
 			for inner_obj in self.dbSchema.keys():
 				if inner_obj == obj:
 					continue
 				for field in self.dbSchema[inner_obj]["fields"]:
 					if "references" in field and field["references"]["ref_table"] == obj:
 						u_inner_obj = self.uncapitalize(inner_obj)
-						self.printt_cls("{}Api.add_resource( {}{}s, '/{}/<int:{}Id>/{}' )".format(self.v_appName, obj, inner_obj, u_obj, u_obj, u_inner_obj))
+						self.printt_cls("{}Api.add_resource( {}{}s, '/{}/<int:{}Id>/{}' )".format(self.uAppName, obj, inner_obj, u_obj, u_obj, u_inner_obj))
 			self.printt_cls("")
 		self.printt_cls("")
 
@@ -82,6 +82,6 @@ class FlaskServerUtils( BaseClassUtils ):
 		'''Creates main method.'''
 		# TODO: we probably want to pass in the port number for the Flask server.
 		self.printt_cls("if __name__ == '__main__':")
-		self.printt_cls("\t{}App.run(port = '5000')".format(self.v_appName))
+		self.printt_cls("\t{}App.run(port = '5000')".format(self.uAppName))
 		self.printt_cls("")
 
