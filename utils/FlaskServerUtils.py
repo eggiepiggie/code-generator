@@ -14,7 +14,7 @@ class FlaskServerUtils( BaseClassUtils ):
 		self.appName = appName
 		self.v_appName = self.uncapitalize(appName)
 		self.objName = objName
-		self.v_objName = self.uncapitalize(objName)
+		self.uObjName = self.uncapitalize(objName)
 		self.dbSchema = self.getSchema(objName)
 		self.objSchema = self.dbSchema[objName]
 		self.type = "flask_server"

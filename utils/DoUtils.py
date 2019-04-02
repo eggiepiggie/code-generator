@@ -11,7 +11,7 @@ class DoUtils( BaseClassUtils ):
 	def __init__(self, objName, toFile = False):
 		super(DoUtils, self).__init__('DoUtils')
 		self.objName = objName
-		self.v_objName = self.uncapitalize(objName)
+		self.uObjName = self.uncapitalize(objName)
 		self.dbSchema = self.getSchema(objName)
 		self.objSchema = self.dbSchema[objName]
 		self.type = "do"
@@ -85,10 +85,10 @@ class DoUtils( BaseClassUtils ):
 		params = []
 		data = []
 		for col in self.objSchema["fields"]:
-			col_name = col["name"]
-			u_col_name = self.uncapitalize(col_name)
-			params.append("{}={}".format(u_col_name, "{}"))
-			data.append("self.{}".format(col_name))
+			colName = col["name"]
+			uColName = self.uncapitalize(colName)
+			params.append("{}={}".format(uColName, "{}"))
+			data.append("self.{}".format(colName))
 		params = ", ".join(params)
 		data = ", ".join(data)
 		self.printt_cls("\t\treturn \"{}DO[{}]\".format({})".format(self.objName, params, data))
@@ -96,13 +96,13 @@ class DoUtils( BaseClassUtils ):
 
 	def generateEqualsTo(self):
 		'''Generates a method for comparing one object to another object.'''
-		self.printt_cls("\tdef equalsTo(self, {}):".format(self.v_objName))
+		self.printt_cls("\tdef equalsTo(self, {}):".format(self.uObjName))
 		self.printt_cls("\t\t'''Compares this object with another object to see if they are equal.'''")
 		for col in self.objSchema["fields"]:
-			col_name = col["name"]
-			if col_name == "Id":
+			colName = col["name"]
+			if colName == "Id":
 				continue
-			self.printt_cls("\t\tif self.{} != {}.{}:".format(col_name, self.v_objName, col_name))
+			self.printt_cls("\t\tif self.{} != {}.{}:".format(colName, self.uObjName, colName))
 			self.printt_cls("\t\t\treturn False")
 		self.printt_cls("\t\treturn True")
 		self.printt_cls("")
@@ -112,8 +112,8 @@ class DoUtils( BaseClassUtils ):
 		self.printt_cls("\t@classmethod")
 		self.printt_cls("\tdef toObj(self, objJson = {}):")
 		self.printt_cls("\t\t'''Converts json into a object.'''")
-		self.printt_cls("\t\t{} = {}DO()".format(self.v_objName, self.objName))
+		self.printt_cls("\t\t{} = {}DO()".format(self.uObjName, self.objName))
 		for col in self.objSchema["fields"]:
-			self.printt_cls("\t\t{}.{} = objJson['{}'] if '{}' in objJson else None".format(self.v_objName, col["name"], col["name"], col["name"]))
-		self.printt_cls("\t\treturn {}".format(self.v_objName))
+			self.printt_cls("\t\t{}.{} = objJson['{}'] if '{}' in objJson else None".format(self.uObjName, col["name"], col["name"], col["name"]))
+		self.printt_cls("\t\treturn {}".format(self.uObjName))
 		self.printt_cls("")

@@ -11,7 +11,7 @@ class DaoUtils( BaseClassUtils ):
 	def __init__(self, objName, toFile = False):
 		super(DaoUtils, self).__init__('DaoUtils')
 		self.objName = objName
-		self.v_objName = self.uncapitalize(objName)
+		self.uObjName = self.uncapitalize(objName)
 		self.dbSchema = self.getSchema(objName)
 		self.objSchema = self.dbSchema[objName]
 		self.type = "dao"
@@ -62,61 +62,58 @@ class DaoUtils( BaseClassUtils ):
 		self.printt_cls("")
 
 	def generateInsert(self):
-		self.printt_cls("\tdef insert{}(self, {} = None):".format(self.objName, self.v_objName))
-		self.printt_cls("\t\t'''Persists {} to the database.'''".format(self.v_objName))
-		self.printt_cls("\t\tif not {}:".format(self.v_objName))
+		self.printt_cls("\tdef insert{}(self, {} = None):".format(self.objName, self.uObjName))
+		self.printt_cls("\t\t'''Persists {} to the database.'''".format(self.uObjName))
+		self.printt_cls("\t\tif not {}:".format(self.uObjName))
 		self.printt_cls("\t\t\treturn")
 		self.printt_cls("")
 		self.buildInsertSql()
-		self.printt_cls("\t\t{}.Id = self.dbConnection.instance.insert_one(insertSql, insertData)".format(self.v_objName))
-		self.printt_cls("\t\treturn {}".format(self.v_objName))
+		self.printt_cls("\t\t{}.Id = self.dbConnection.instance.insert_one(insertSql, insertData)".format(self.uObjName))
+		self.printt_cls("\t\treturn {}".format(self.uObjName))
 		self.printt_cls("")
 
 	def generateUpdate(self):
-		self.printt_cls("\tdef update{}(self, {} = None):".format(self.objName, self.v_objName))
-		self.printt_cls("\t\t'''Updates and persists {} to the database.'''".format(self.v_objName))
-		self.printt_cls("\t\tif not {}:".format(self.v_objName))
+		self.printt_cls("\tdef update{}(self, {} = None):".format(self.objName, self.uObjName))
+		self.printt_cls("\t\t'''Updates and persists {} to the database.'''".format(self.uObjName))
+		self.printt_cls("\t\tif not {}:".format(self.uObjName))
 		self.printt_cls("\t\t\treturn")
 		self.printt_cls("")
 		self.buildUpdateSql()
-		self.printt_cls("\t\t{}.Id = self.dbConnection.instance.update_one(updateSql, updateData)".format(self.v_objName))
-		self.printt_cls("\t\treturn {}".format(self.v_objName))
+		self.printt_cls("\t\t{}.Id = self.dbConnection.instance.update_one(updateSql, updateData)".format(self.uObjName))
+		self.printt_cls("\t\treturn {}".format(self.uObjName))
 		self.printt_cls("")
 
 	def generateDeleteMethods(self):
 		for col in self.objSchema["fields"]:
 			if self.isUnique(col):
-				col_name = col["name"]
-				u_col_name = self.uncapitalize(col_name)
+				colName = col["name"]
+				uColName = self.uncapitalize(colName)
 
-				self.printt_cls("\tdef deleteBy{}(self, {} = None):".format(col_name, u_col_name))
-				self.printt_cls("\t\t'''Deletes {} object from the database by {}.'''".format(self.v_objName, u_col_name))
-				self.printt_cls("\t\tif not {}:".format(u_col_name))
+				self.printt_cls("\tdef deleteBy{}(self, {} = None):".format(colName, uColName))
+				self.printt_cls("\t\t'''Deletes {} object from the database by {}.'''".format(self.uObjName, uColName))
+				self.printt_cls("\t\tif not {}:".format(uColName))
 				self.printt_cls("\t\t\treturn")
-				self.printt_cls("\t\tdeleteBy{}Sql = \"DELETE FROM {} WHERE {} = {}\".format({})".format(col_name, self.objName, col_name, self.getEscCharacters(col), u_col_name))
-				self.printt_cls("\t\treturn self.dbConnection.instance.execute_query(deleteBy{}Sql)".format(col_name))
+				self.printt_cls("\t\tdeleteBy{}Sql = \"DELETE FROM {} WHERE {} = {}\".format({})".format(colName, self.objName, colName, self.getEscCharacters(col), uColName))
+				self.printt_cls("\t\treturn self.dbConnection.instance.execute_query(deleteBy{}Sql)".format(colName))
 				self.printt_cls("")
 
 		# Creates delete method by object.
-		self.printt_cls("\tdef deleteBy{}(self, {} = None):".format(self.objName, self.v_objName))
-		self.printt_cls("\t\t'''Deletes {} to the database.'''".format(self.v_objName))
-		self.printt_cls("\t\tif not {}:".format(self.v_objName))
+		self.printt_cls("\tdef deleteBy{}(self, {} = None):".format(self.objName, self.uObjName))
+		self.printt_cls("\t\t'''Deletes {} to the database.'''".format(self.uObjName))
+		self.printt_cls("\t\tif not {}:".format(self.uObjName))
 		self.printt_cls("\t\t\treturn")
-		self.printt_cls("\t\treturn self.deleteById({}.Id)".format(self.v_objName))
+		self.printt_cls("\t\treturn self.deleteById({}.Id)".format(self.uObjName))
 		self.printt_cls("")
 
 	def generateGetAll(self):
 		'''Creates a method that would get all the objects given a limit.'''
 		self.printt_cls("\tdef getAll{}s(self, limit = None):".format(self.objName))	
-		self.printt_cls("\t\t'''Returns all {}s.'''".format(self.v_objName))
+		self.printt_cls("\t\t'''Returns all {}s.'''".format(self.uObjName))
 		self.printt_cls("\t\tselectSql = \"SELECT * FROM {}\"".format(self.objName))
 		self.printt_cls("")
 		self.printt_cls("\t\tresultSet = self.dbConnection.instance.query_all_result(selectSql)")
-		self.printt_cls("\t\tobjList = []")
-		self.printt_cls("\t\tfor row in resultSet:")
-		self.printt_cls("\t\t\t{} = {}DO.toObj(row)".format(self.v_objName, self.objName))
-		self.printt_cls("\t\t\tobjList.append({})".format(self.v_objName))
-		self.printt_cls("\t\treturn objList")
+		self.printt_cls("\t\tdoJsonList = [{}DO.toObj(row) for row in resultSet]".format(self.objName))
+		self.printt_cls("\t\treturn doJsonList")
 		self.printt_cls("")
 
 	def buildInsertSql(self):
@@ -139,12 +136,12 @@ class DaoUtils( BaseClassUtils ):
 		self.printt_cls("")
 		self.printt_cls("\t\tinsertData = {")
 		for col in self.objSchema["fields"]:
-			col_name = col["name"]
-			u_col_name = self.uncapitalize(col_name)
-			if col_name == "Id":
+			colName = col["name"]
+			uColName = self.uncapitalize(colName)
+			if colName == "Id":
 				continue
 			else:
-				self.printt_cls("\t\t\t'{}' : {}.{},".format(u_col_name, self.v_objName, col_name))
+				self.printt_cls("\t\t\t'{}' : {}.{},".format(uColName, self.uObjName, colName))
 		self.printt_cls("\t\t}")
 		self.printt_cls("")
 
@@ -152,40 +149,37 @@ class DaoUtils( BaseClassUtils ):
 		"""Creates methods for fetching by unique key (e.g. id, name, etc.)."""
 		for col in self.objSchema["fields"]:
 			if self.isUnique(col):
-				col_name = col["name"]
-				u_col_name = self.uncapitalize(col_name)
-				self.printt_cls("\tdef get{}By{}(self, {}):".format(self.objName, col_name, u_col_name))
-				self.printt_cls("\t\t'''Retrieves {} by {} from the database.'''".format(self.v_objName, u_col_name))
-				self.printt_cls("\t\tselectBy{}Sql = \"SELECT * FROM {} WHERE {} = {}\".format({})".format(col_name, self.objName, col_name, self.getEscCharacters(col), u_col_name))
+				colName = col["name"]
+				uColName = self.uncapitalize(colName)
+				self.printt_cls("\tdef get{}By{}(self, {}):".format(self.objName, colName, uColName))
+				self.printt_cls("\t\t'''Retrieves {} by {} from the database.'''".format(self.uObjName, uColName))
+				self.printt_cls("\t\tselectBy{}Sql = \"SELECT * FROM {} WHERE {} = {}\".format({})".format(colName, self.objName, colName, self.getEscCharacters(col), uColName))
 				self.printt_cls("")
-				self.printt_cls("\t\tresultSet = self.dbConnection.instance.query_single_result(selectBy{}Sql)".format(col_name))
-				self.printt_cls("\t\t{} = {}DO.toObj(resultSet)".format(self.v_objName, self.objName))
-				self.printt_cls("\t\treturn {}".format(self.v_objName))
+				self.printt_cls("\t\tresultSet = self.dbConnection.instance.query_single_result(selectBy{}Sql)".format(colName))
+				self.printt_cls("\t\t{} = {}DO.toObj(resultSet)".format(self.uObjName, self.objName))
+				self.printt_cls("\t\treturn {}".format(self.uObjName))
 				self.printt_cls("")
 
 	def generateSelectForOtherObjects(self):
 		"""Creates a getter for list all object being to a key (foreign key.)"""
 		for col in self.objSchema["fields"]:
 			if "references" in col:
-				col_name = col["name"]
-				ref_table = col["references"]["ref_table"]
-				u_ref_table = self.uncapitalize(ref_table)
+				colName = col["name"]
+				refTable = col["references"]["ref_table"]
+				uRefTable = self.uncapitalize(refTable)
 				ref_column = col["references"]["ref_column"]
-				self.printt_cls("\tdef get{}sFor{}(self, {}):".format(self.objName, ref_table, u_ref_table))
-				self.printt_cls("\t\t'''Returns all the {}s belonging to provided {}.'''".format(self.v_objName, u_ref_table))
-				self.printt_cls("\t\tselectSql = \"SELECT * FROM {} WHERE {} = {}\".format({}.{})".format(self.objName, col_name, "{}", u_ref_table, ref_column))
+				self.printt_cls("\tdef get{}sFor{}(self, {}):".format(self.objName, refTable, uRefTable))
+				self.printt_cls("\t\t'''Returns all the {}s belonging to provided {}.'''".format(self.uObjName, uRefTable))
+				self.printt_cls("\t\tselectSql = \"SELECT * FROM {} WHERE {} = {}\".format({}.{})".format(self.objName, colName, "{}", uRefTable, ref_column))
 				self.printt_cls("")
 				self.printt_cls("\t\tresultSet = self.dbConnection.instance.query_all_result(selectSql)")
-				self.printt_cls("\t\tobjList = []")
-				self.printt_cls("\t\tfor row in resultSet:")
-				self.printt_cls("\t\t\t{} = {}DO.toObj(row)".format(self.v_objName, self.objName))
-				self.printt_cls("\t\t\tobjList.append({})".format(self.v_objName))
-				self.printt_cls("\t\treturn objList")
+				self.printt_cls("\t\tdoJsonList = [{}DO.toObj(row) for row in resultSet]".format(self.objName))
+				self.printt_cls("\t\treturn doJsonList")
 				self.printt_cls("")
 
 	def generateInstance(self):
 		self.printt_cls("")
-		self.printt_cls("{}DAO = {}DAO()".format(self.v_objName, self.objName))
+		self.printt_cls("{}DAO = {}DAO()".format(self.uObjName, self.objName))
 
 	def buildUpdateSql(self):
 		params = []
@@ -204,9 +198,9 @@ class DaoUtils( BaseClassUtils ):
 		self.printt_cls("")
 		self.printt_cls("\t\tupdateData = {")
 		for col in self.objSchema["fields"]:
-			col_name = col["name"]
-			u_col_name = self.uncapitalize(col_name)
-			self.printt_cls("\t\t\t'{}' : {}.{},".format(u_col_name, self.v_objName, col_name))
+			colName = col["name"]
+			uColName = self.uncapitalize(colName)
+			self.printt_cls("\t\t\t'{}' : {}.{},".format(uColName, self.uObjName, colName))
 		self.printt_cls("\t\t}")
 		self.printt_cls("")
 

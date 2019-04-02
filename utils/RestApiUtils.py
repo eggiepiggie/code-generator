@@ -12,7 +12,7 @@ class RestApiUtils( BaseClassUtils ):
 		'''We need to validate that this is a legit object in the json schema.'''
 		super(RestApiUtils, self).__init__('RestApiUtils')
 		self.objName = objName
-		self.v_objName = self.uncapitalize(objName)
+		self.uObjName = self.uncapitalize(objName)
 		self.dbSchema = self.getSchema(objName)
 		self.objSchema = self.dbSchema[objName]
 		self.type = "rest_api"
@@ -46,53 +46,53 @@ class RestApiUtils( BaseClassUtils ):
 		"""Creates import statemnts for referencd objects."""
 		self.printt_cls("from flask_restful import Resource, reqparse")
 		self.printt_cls("from app.bo.{} import {}BO".format(self.objName, self.objName))
-		self.printt_cls("from app.dao.{} import {}DAO".format(self.objName, self.v_objName))
+		self.printt_cls("from app.dao.{} import {}DAO".format(self.objName, self.uObjName))
 		self.printt_cls("")
 		self.printt_cls("")
 
 	def generateGetAll(self):
+		"""Creates endpoints for get all BO objects."""
 		self.printt_cls("class {}GetAll(Resource):".format(self.objName))
 		self.printt_cls("")
 		self.printt_cls("\tdef get(self):")
-		self.printt_cls("\t\t{}s = {}DAO.getAll{}s()".format(self.v_objName, self.v_objName, self.objName))
-		self.printt_cls("\t\t{}sJson = []".format(self.v_objName))
-		self.printt_cls("\t\tfor {} in {}s:".format(self.v_objName, self.v_objName))
-		self.printt_cls("\t\t\t{}sJson.append({}.toJson())".format(self.v_objName, self.v_objName))
-		self.printt_cls("\t\treturn {}sJson".format(self.v_objName))
+		self.printt_cls("\t\t{}s = {}DAO.getAll{}s()".format(self.uObjName, self.uObjName, self.objName))
+		self.printt_cls("\t\t{}BOs = [{}BO(do) for do in {}s]".format(self.uObjName, self.objName, self.uObjName))
+		self.printt_cls("\t\tboJsonList = [bo.toJson() for bo in {}BOs]".format(self.uObjName))
+		self.printt_cls("\t\treturn boJsonList")
 		self.printt_cls("")
 		self.printt_cls("\tdef post(self):")
 		self.printt_cls("\t\targs = getParameters(reqparse.RequestParser())")
-		self.printt_cls("\t\t{} = {}BO()".format(self.v_objName, self.objName))
+		self.printt_cls("\t\t{} = {}BO()".format(self.uObjName, self.objName))
 		for col in self.objSchema["fields"]:
 			if col["name"] != "Id":
-				col_name = col["name"]
-				self.printt_cls("\t\t{}.set{}(args['{}'])".format(self.v_objName, col_name, col_name))
-		self.printt_cls("\t\t{}.save()".format(self.v_objName))
-		self.printt_cls("\t\treturn {}.{}.toJson()".format(self.v_objName, self.v_objName))
+				colName = col["name"]
+				self.printt_cls("\t\t{}.set{}(args['{}'])".format(self.uObjName, colName, colName))
+		self.printt_cls("\t\t{}.save()".format(self.uObjName))
+		self.printt_cls("\t\treturn {}.{}.toJson()".format(self.uObjName, self.uObjName))
 		self.printt_cls("")
 		self.printt_cls("")
 
 	def generateById(self):
 		self.printt_cls("class {}ById(Resource):".format(self.objName))
 		self.printt_cls("")
-		self.printt_cls("\tdef get(self, {}Id):".format(self.v_objName))
-		self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.v_objName, self.v_objName, self.objName, self.v_objName))
-		self.printt_cls("\t\t{}BO = {}BO({}DO)".format(self.v_objName, self.objName, self.v_objName))
-		self.printt_cls("\t\treturn {}BO.toJson()".format(self.v_objName))
+		self.printt_cls("\tdef get(self, {}Id):".format(self.uObjName))
+		self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.uObjName, self.uObjName, self.objName, self.uObjName))
+		self.printt_cls("\t\t{}BO = {}BO({}DO)".format(self.uObjName, self.objName, self.uObjName))
+		self.printt_cls("\t\treturn {}BO.toJson()".format(self.uObjName))
 		self.printt_cls("")
-		self.printt_cls("\tdef put(self, {}Id):".format(self.v_objName))
+		self.printt_cls("\tdef put(self, {}Id):".format(self.uObjName))
 		self.printt_cls("\t\targs = getParameters(reqparse.RequestParser())")
-		self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.v_objName, self.v_objName, self.objName, self.v_objName))
-		self.printt_cls("\t\t{} = {}BO({}DO)".format(self.v_objName, self.objName, self.v_objName))
+		self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.uObjName, self.uObjName, self.objName, self.uObjName))
+		self.printt_cls("\t\t{} = {}BO({}DO)".format(self.uObjName, self.objName, self.uObjName))
 		for col in self.objSchema["fields"]:
 			if col["name"] != "Id":
-				col_name = col["name"]
-				self.printt_cls("\t\t{}.set{}(args['{}'])".format(self.v_objName, col_name, col_name))
-		self.printt_cls("\t\t{}.update()".format(self.v_objName))
-		self.printt_cls("\t\treturn {}.{}.toJson()".format(self.v_objName, self.v_objName))
+				colName = col["name"]
+				self.printt_cls("\t\t{}.set{}(args['{}'])".format(self.uObjName, colName, colName))
+		self.printt_cls("\t\t{}.update()".format(self.uObjName))
+		self.printt_cls("\t\treturn {}.{}.toJson()".format(self.uObjName, self.uObjName))
 		self.printt_cls("")
-		self.printt_cls("\tdef delete(self, {}Id):".format(self.v_objName))
-		self.printt_cls("\t\treturn {}DAO.deleteById({}Id)".format(self.v_objName, self.v_objName))
+		self.printt_cls("\tdef delete(self, {}Id):".format(self.uObjName))
+		self.printt_cls("\t\treturn {}DAO.deleteById({}Id)".format(self.uObjName, self.uObjName))
 		self.printt_cls("")
 		self.printt_cls("")
 
@@ -104,14 +104,12 @@ class RestApiUtils( BaseClassUtils ):
 				if "references" in field and field["references"]["ref_table"] == self.objName:
 					u_obj = self.uncapitalize(obj)
 					self.printt_cls("class {}{}s(Resource):".format(self.objName, obj))
-					self.printt_cls("\tdef get(self, {}Id):".format(self.v_objName))
-					self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.v_objName, self.v_objName, self.objName, self.v_objName))
-					self.printt_cls("\t\t{} = {}BO({}DO)".format(self.v_objName, self.objName, self.v_objName))
-					self.printt_cls("\t\t{}s = {}.get{}s()".format(u_obj, self.v_objName, obj))
-					self.printt_cls("\t\tresults = []")
-					self.printt_cls("\t\tfor {} in {}s:".format(u_obj, u_obj))
-					self.printt_cls("\t\t\tresults.append({}.toJson())".format(u_obj))
-					self.printt_cls("\t\treturn results")
+					self.printt_cls("\tdef get(self, {}Id):".format(self.uObjName))
+					self.printt_cls("\t\t{}DO = {}DAO.get{}ById({}Id)".format(self.uObjName, self.uObjName, self.objName, self.uObjName))
+					self.printt_cls("\t\t{} = {}BO({}DO)".format(self.uObjName, self.objName, self.uObjName))
+					self.printt_cls("\t\t{}s = {}.get{}s()".format(u_obj, self.uObjName, obj))
+					self.printt_cls("\t\tboJsonList = [c.toJson() for c in {}s]".format(u_obj))
+					self.printt_cls("\t\treturn boJsonList")
 					self.printt_cls("")
 					self.printt_cls("")
 

@@ -6,13 +6,14 @@ from datetime import datetime
 
 import resources.cli_styles as cs
 
+
 class BoUtils( BaseClassUtils ):
 
 	def __init__(self, objName, toFile = False):
 		'''We need to validate that this is a legit object in the json schema.'''
 		super(BoUtils, self).__init__('BoUtils')
 		self.objName = objName
-		self.v_objName = self.uncapitalize(objName)
+		self.uObjName = self.uncapitalize(objName)
 		self.dbSchema = self.getSchema(objName)
 		self.objSchema = self.dbSchema[objName]
 		self.type = "bo"
@@ -50,14 +51,14 @@ class BoUtils( BaseClassUtils ):
 		self.printt_cls("from app.bo.Base import BaseBO")
 		self.printt_cls("from app.do.{} import {}DO".format(self.objName, self.objName))
 		self.printt_cls("")
-		self.printt_cls("from app.dao.{} import {}DAO".format(self.objName, self.v_objName))
+		self.printt_cls("from app.dao.{} import {}DAO".format(self.objName, self.uObjName))
 		for obj in self.dbSchema.keys():
 			if obj == self.objName:
 				for field in self.dbSchema[obj]["fields"]:
 					if "references" in field:
-						ref_table = field["references"]["ref_table"]
-						self.printt_cls("from app.dao.{} import {}DAO".format(ref_table, self.uncapitalize(ref_table)))
-						self.printt_cls("from app.do.{} import {}DO".format(ref_table, ref_table))
+						refTable = field["references"]["ref_table"]
+						self.printt_cls("from app.dao.{} import {}DAO".format(refTable, self.uncapitalize(refTable)))
+						self.printt_cls("from app.do.{} import {}DO".format(refTable, refTable))
 			else:
 				for field in self.dbSchema[obj]["fields"]:
 					if "references" in field and field["references"]["ref_table"] == self.objName:
@@ -68,44 +69,42 @@ class BoUtils( BaseClassUtils ):
 	def generateClassSignature(self):
 		"""Creates class signature."""
 		self.printt_cls("class {}BO( BaseBO ):".format(self.objName))
-		self.printt_cls("\t'''Used for representing a business object {}.'''".format(self.v_objName))
+		self.printt_cls("\t'''Used for representing a business object {}.'''".format(self.uObjName))
 		self.printt_cls("")
 
 	def generateInit(self):
 		"""Creates the init function. Must accept a valid DO object."""
-		self.printt_cls("\tdef __init__(self, {} = None):".format(self.v_objName))
+		self.printt_cls("\tdef __init__(self, {} = None):".format(self.uObjName))
 		self.printt_cls("\t\t'''Must accept a valid {}DO object.'''".format(self.objName))
 		self.printt_cls("\t\tsuper({}BO, self).__init__('{}BO')".format(self.objName, self.objName))
-		self.printt_cls("\t\tself.{} = {} if {} else {}DO()".format(self.v_objName, self.v_objName, self.v_objName, self.objName))
+		self.printt_cls("\t\tself.{} = {} if {} else {}DO()".format(self.uObjName, self.uObjName, self.uObjName, self.objName))
 		for col in self.objSchema["fields"]:
-			col_name = col["name"]
+			colName = col["name"]
 			if "references" in col:
-				ref_table = col["references"]["ref_table"]
-				u_ref_table = self.uncapitalize(ref_table)
-				self.printt_cls("\t\tself.{} = {}DAO.get{}ById({}.{}) if {} else {}DO()".format(u_ref_table, u_ref_table, ref_table, self.v_objName, col_name, self.v_objName, ref_table))
+				refTable = col["references"]["ref_table"]
+				uRefTable = self.uncapitalize(refTable)
+				self.printt_cls("\t\tself.{} = {}DAO.get{}ById({}.{}) if {} else {}DO()".format(uRefTable, uRefTable, refTable, self.uObjName, colName, self.uObjName, refTable))
 		self.printt_cls("")
 
 	def generateGettersAndSetters(self):
-		#TODO: We need to handle reference columns col["references"]
 		"""Creates getters and setters for every field of the object."""
 		self.printt_cls("\t# ==================================")
 		self.printt_cls("\t#  Property Functions")
 		self.printt_cls("\t# ==================================")
 		for col in self.objSchema["fields"]:
-			col_name = col["name"]
-			u_col_name = self.uncapitalize(col_name)
-			if col_name == "Id":
-				self.printt_cls("\tdef get{}(self):".format(col_name))
-				self.printt_cls("\t\treturn self.{}.{}".format(self.v_objName, col_name))
+			colName = col["name"]
+			uColName = self.uncapitalize(colName)
+			if colName == "Id":
+				self.printt_cls("\tdef get{}(self):".format(colName))
+				self.printt_cls("\t\treturn self.{}.{}".format(self.uObjName, colName))
 				self.printt_cls("")
 				continue
-			# elif "references" not in col:
 			else:
-				self.printt_cls("\tdef get{}(self):".format(col_name))
-				self.printt_cls("\t\treturn self.{}.{}".format(self.v_objName, col_name))
+				self.printt_cls("\tdef get{}(self):".format(colName))
+				self.printt_cls("\t\treturn self.{}.{}".format(self.uObjName, colName))
 				self.printt_cls("")
-				self.printt_cls("\tdef set{}(self, {}):".format(col_name, u_col_name))
-				self.printt_cls("\t\tself.{}.{} = {}".format(self.v_objName, col_name, u_col_name))
+				self.printt_cls("\tdef set{}(self, {}):".format(colName, uColName))
+				self.printt_cls("\t\tself.{}.{} = {}".format(self.uObjName, colName, uColName))
 				self.printt_cls("")
 
 	def generateObjectGettersForFK(self):
@@ -113,21 +112,13 @@ class BoUtils( BaseClassUtils ):
 		self.printt_cls("\t#  Foreign Key Functions")
 		self.printt_cls("\t# ==================================")
 		for col in self.objSchema["fields"]:
-			# col_name = col["name"]
 			if "references" in col:
-				ref_table = col["references"]["ref_table"]
-				u_ref_table = self.uncapitalize(ref_table)
-				#ref_column = col["references"]["ref_column"]
-				self.printt_cls("\tdef get{}(self):".format(ref_table))
-				self.printt_cls("\t\tself.{} = {}DAO.get{}ById(self.{}.{})".format(u_ref_table, u_ref_table, ref_table, self.v_objName, col["name"]))
-				self.printt_cls("\t\treturn self.{}".format(u_ref_table))
+				refTable = col["references"]["ref_table"]
+				uRefTable = self.uncapitalize(refTable)
+				self.printt_cls("\tdef get{}(self):".format(refTable))
+				self.printt_cls("\t\tself.{} = {}DAO.get{}ById(self.{}.{})".format(uRefTable, uRefTable, refTable, self.uObjName, col["name"]))
+				self.printt_cls("\t\treturn self.{}".format(uRefTable))
 				self.printt_cls("")
-				# self.printt_cls("\tdef set{}(self, {}):".format(ref_table, u_ref_table))
-				# self.printt_cls("\t\t'''Accepts a DO and stores DO object.'''")
-				# self.printt_cls("\t\tself.{}.{} = {}.{}".format(self.v_objName, col_name, u_ref_table, ref_column))
-				# self.printt_cls("\t\tself.{} = {}DAO.get{}ById({}.Id)".format(u_ref_table, u_ref_table, ref_table, u_ref_table))
-				# self.printt_cls("\t\treturn self.{}".format(u_ref_table))
-				# self.printt_cls("")
 
 	def generateCrudFunctions(self):
 		"""Creates CRUD functions for the object."""
@@ -135,15 +126,15 @@ class BoUtils( BaseClassUtils ):
 		self.printt_cls("\t#  CRUD Functions")
 		self.printt_cls("\t# ==================================")
 		self.printt_cls("\tdef save(self):")
-		self.printt_cls("\t\tself.{} = {}DAO.insert{}(self.{})".format(self.v_objName, self.v_objName, self.objName, self.v_objName))
-		self.printt_cls("\t\treturn self.{}".format(self.v_objName))
+		self.printt_cls("\t\tself.{} = {}DAO.insert{}(self.{})".format(self.uObjName, self.uObjName, self.objName, self.uObjName))
+		self.printt_cls("\t\treturn self.{}".format(self.uObjName))
 		self.printt_cls("")
 		self.printt_cls("\tdef update(self):")
-		self.printt_cls("\t\tself.{} = {}DAO.update{}(self.{})".format(self.v_objName, self.v_objName, self.objName, self.v_objName))
-		self.printt_cls("\t\treturn self.{}".format(self.v_objName))
+		self.printt_cls("\t\tself.{} = {}DAO.update{}(self.{})".format(self.uObjName, self.uObjName, self.objName, self.uObjName))
+		self.printt_cls("\t\treturn self.{}".format(self.uObjName))
 		self.printt_cls("")
 		self.printt_cls("\tdef delete(self):")
-		self.printt_cls("\t\treturn {}DAO.deleteBy{}(self.{})".format(self.v_objName, self.objName, self.v_objName))
+		self.printt_cls("\t\treturn {}DAO.deleteBy{}(self.{})".format(self.uObjName, self.objName, self.uObjName))
 		self.printt_cls("")
 
 	def generateRefObjects(self):
@@ -154,17 +145,17 @@ class BoUtils( BaseClassUtils ):
 			for field in self.dbSchema[obj]["fields"]:
 				if "references" in field and field["references"]["ref_table"] == self.objName:
 					u_obj = self.uncapitalize(obj)
-					u_col_name = field["name"]
+					uColName = field["name"]
 					self.printt_cls("\t# ==================================")
 					self.printt_cls("\t#  {} List Functions".format(obj))
 					self.printt_cls("\t# ==================================")
 					self.printt_cls("\tdef get{}s(self):".format(obj))
-					self.printt_cls("\t\t'''Returns {}s belonging to this {}.'''".format(u_obj, self.v_objName))
-					self.printt_cls("\t\tself.{}s = {}DAO.get{}sFor{}(self.{})".format(u_obj, u_obj, obj, self.objName, self.v_objName))
+					self.printt_cls("\t\t'''Returns {}s belonging to this {}.'''".format(u_obj, self.uObjName))
+					self.printt_cls("\t\tself.{}s = {}DAO.get{}sFor{}(self.{})".format(u_obj, u_obj, obj, self.objName, self.uObjName))
 					self.printt_cls("\t\treturn self.{}s".format(u_obj))
 					self.printt_cls("")
 					self.printt_cls("\tdef add{}(self, {}):".format(obj, u_obj))
-					self.printt_cls("\t\t{}.{} = self.{}.Id".format(u_obj, u_col_name, self.v_objName))
+					self.printt_cls("\t\t{}.{} = self.{}.Id".format(u_obj, uColName, self.uObjName))
 					self.printt_cls("\t\t{} = {}DAO.update{}({})".format(u_obj, u_obj, obj, u_obj))
 					self.printt_cls("\t\tself.{}s.append({})".format(u_obj, u_obj))
 					self.printt_cls("")
@@ -175,17 +166,19 @@ class BoUtils( BaseClassUtils ):
 					self.printt_cls("")
 
 	def generateToJson(self):
-		'''Generates a method that will return a JSON representation of BO.'''
-		self.printt_cls("\tdef toJson(self):")
+		'''Generates a method that will return a JSON representation of BO.  Can be a simple or complex JSON.'''
+		self.printt_cls("\tdef toJson(self, isSimple = False):")
 		self.printt_cls("\t\t'''Returns a JSON representation of BO.'''")
-		self.printt_cls("\t\tboJson = self.{}.toJson()".format(self.v_objName))
+		self.printt_cls("\t\tboJson = self.{}.toJson()".format(self.uObjName))
+		self.printt_cls("")
 
 		# Get the FK object.
+		self.printt_cls("\t\tif not isSimple:")
 		for col in self.objSchema["fields"]:
 			if "references" in col:
-				ref_table = col["references"]["ref_table"]
-				u_ref_table = self.uncapitalize(ref_table)
-				self.printt_cls("\t\tboJson['{}'] = self.{}.toJson()".format(ref_table, u_ref_table))
+				refTable = col["references"]["ref_table"]
+				uRefTable = self.uncapitalize(refTable)
+				self.printt_cls("\t\t\tboJson['{}'] = self.{}.toJson()".format(refTable, uRefTable))
 		self.printt_cls("")
 		
 		# Get objects referencing.
@@ -195,7 +188,7 @@ class BoUtils( BaseClassUtils ):
 			for field in self.dbSchema[obj]["fields"]:
 				if "references" in field and field["references"]["ref_table"] == self.objName:
 					u_obj = self.uncapitalize(obj)
-					self.printt_cls("\t\tself.{}s = {}DAO.get{}sFor{}(self.{})".format(u_obj, u_obj, obj, self.objName, self.v_objName))
-					self.printt_cls("\t\tboJson['{}List'] = [c.toJson() for c in self.{}s]".format(u_obj, u_obj))
+					self.printt_cls("\t\t\tself.{}s = {}DAO.get{}sFor{}(self.{})".format(u_obj, u_obj, obj, self.objName, self.uObjName))
+					self.printt_cls("\t\t\tboJson['{}List'] = [c.toJson() for c in self.{}s]".format(obj, u_obj))
 					self.printt_cls("")
 		self.printt_cls("\t\treturn boJson")
