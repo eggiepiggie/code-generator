@@ -8,6 +8,7 @@ import resources.cli_styles as cs
 
 class BaseClassUtils(object):
 
+	fullFilePath = None
 	toFile = None
 	type = None
 	objName = None
@@ -15,9 +16,11 @@ class BaseClassUtils(object):
 	def __init__(self, class_name = "BaseDAO"):
 		self.class_name = class_name
 
-	def openFile(self):
+	def openFile(self, fullFilePath = None):
 		'''Opens the file for write access.'''
-		if self.toFile:
+		if self.fullFilePath:
+			self.boFile = open(self.fullFilePath, 'w')
+		elif self.toFile:
 			self.boFile = open('app/{}/{}.py'.format(self.type, self.objName), 'w')
 
 	def closeFile(self):

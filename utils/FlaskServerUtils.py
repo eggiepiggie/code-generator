@@ -48,6 +48,7 @@ class FlaskServerUtils( BaseClassUtils ):
 		"""Creates import statements."""
 		self.printt_cls("from flask import Flask, request")
 		self.printt_cls("from flask_restful import Api")
+		self.printt_cls("from flask_cors import CORS")
 		self.printt_cls("")
 		for obj in self.dbSchema.keys():
 			self.printt_cls("from app.rest_api.{} import *".format(obj))
@@ -56,6 +57,7 @@ class FlaskServerUtils( BaseClassUtils ):
 	def generateServer(self):
 		'''Creates code for generating Flask server API.'''
 		self.printt_cls("{}App = Flask(__name__)".format(self.uAppName))
+		self.printt_cls("CORS({}App)".format(self.uAppName))
 		self.printt_cls("{}Api = Api({}App)".format(self.uAppName, self.uAppName))
 		self.printt_cls("")
 
@@ -76,6 +78,16 @@ class FlaskServerUtils( BaseClassUtils ):
 						u_inner_obj = self.uncapitalize(inner_obj)
 						self.printt_cls("{}Api.add_resource( {}{}s, '/{}/<int:{}Id>/{}' )".format(self.uAppName, obj, inner_obj, u_obj, u_obj, u_inner_obj))
 			self.printt_cls("")
+			
+			"""Generates the method for fetching all of this object type from the database."""
+			# self.printt_cls("@{}App.route('/{}', methods = ['GET'])".format(self.uAppName, u_obj))
+			# self.printt_cls("def getAll{}():".format(obj))
+			# self.printt_cls("\t{}s = {}DAO.getAll{}s()".format(u_obj, u_obj, obj))
+			# self.printt_cls("\t{}BOs = [{}BO(do) for do in {}s]".format(u_obj, obj, u_obj))
+			# self.printt_cls("\tboJsonList = [bo.toJson() for bo in {}BOs]".format(u_obj))
+			# self.printt_cls("\treturn render_template('{}Index.html', objs = boJsonList)".format(u_obj))
+			# self.printt_cls("")
+			# self.printt_cls("")
 		self.printt_cls("")
 
 	def generateMain(self):

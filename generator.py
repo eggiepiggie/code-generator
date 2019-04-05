@@ -7,6 +7,8 @@ from utils.DoUtils import DoUtils
 from utils.DaoUtils import DaoUtils
 from utils.RestApiUtils import RestApiUtils
 from utils.FlaskServerUtils import FlaskServerUtils
+from utils.TsModelUtils import TsModelUtils
+
 import sys
 
 def main(args):
@@ -74,6 +76,14 @@ def main(args):
 		apiu = RestApiUtils(obj_name, True if mode == "--file" else False)
 		apiu.generateClass()
 
+	elif action == "--create-ts-model":
+		if not obj_name:
+			printt_error("No object parameter is provided.")
+			prompt()
+			return
+		tsmu = TsModelUtils(obj_name, True if mode == "--file" else False)
+		tsmu.generateClass()
+
 	elif action == "--create-all-obj":
 		if not obj_name:
 			printt_error("No object parameter is provided.")
@@ -87,6 +97,8 @@ def main(args):
 		bou.generateClass()
 		apiu = RestApiUtils(obj_name, True if mode == "--file" else False)
 		apiu.generateClass()
+		tsmu = TsModelUtils(obj_name, True if mode == "--file" else False)
+		tsmu.generateClass()
 
 	elif action == "--deploy":
 		objList = ['Department', 'Item', 'Purchase', 'PurchaseItemList', 'StockLevel', 'PriceHistory']
@@ -99,6 +111,8 @@ def main(args):
 			bou.generateClass()
 			apiu = RestApiUtils(obj_name, True)
 			apiu.generateClass()
+			tsmu = TsModelUtils(obj_name, True)
+			tsmu.generateClass()
 		fsu = FlaskServerUtils('Department', 'Market', True)
 		fsu.generateClass()
 
@@ -138,6 +152,9 @@ def prompt():
 	printt()
 	printt("- Generate REST API class for object.", cs.PASTEL_GREEN)
 	printt("\tgenerator.py --create-rest-api {}<obj-name> <--file>".format(cs.PASTEL_PINK), cs.PASTEL_BLUE)
+	printt()
+	printt("- Generate TS model class for object.", cs.PASTEL_GREEN)
+	printt("\tgenerator.py --ts-model {}<obj-name> <--file>".format(cs.PASTEL_PINK), cs.PASTEL_BLUE)
 	printt()
 	printt("- Generate all class for object.", cs.PASTEL_GREEN)
 	printt("\tgenerator.py --create-all-obj {}<obj-name> <--file>".format(cs.PASTEL_PINK), cs.PASTEL_BLUE)

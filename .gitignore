@@ -7,3 +7,4 @@
 /app/rest_api/
 !/app/rest_api/Base.py
 /*Server.py
+.vscode/settings.json
